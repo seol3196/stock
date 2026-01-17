@@ -1,0 +1,117 @@
+import db from "@/lib/db";
+import { Users, TrendingUp, Coins } from "lucide-react";
+import { getSession } from "@/lib/auth";
+import { redirect } from "next/navigation";
+
+export default async function TeacherDashboard() {
+    const session = await getSession();
+    if (!session || session.role !== "teacher") {
+        redirect("/");
+    }
+
+    const teacherId = session.id as string;
+
+    // 이 교사가 만든 학생 수만 카운트
+    const studentCount = db.prepare('SELECT COUNT(*) as count FROM students WHERE teacher_id = ?').get(teacherId) as { count: number };
+
+    // 이 교사가 상장한 주식 수만 카운트
+    const stockCount = db.prepare('SELECT COUNT(*) as count FROM stocks WHERE teacher_id = ?').get(teacherId) as { count: number };
+
+    // 이 교사의 학생들의 총 자산만 계산
+    const totalMoney = db.prepare(`
+    SELECT 
+      SUM(cash) as total_cash,
+      SUM(savings_balance) as total_savings
+    FROM students
+    WHERE teacher_id = ?
+  `).get(teacherId) as { total_cash: number | null; total_savings: number | null };
+
+    const totalAssets = (totalMoney.total_cash || 0) + (totalMoney.total_savings || 0);
+
+    return (
+        <div>
+            <h1 style={{ fontSize: "3rem", fontWeight: "800", marginBottom: "3rem" }}>대시보드</h1>
+
+            {/* Stats Grid - Horizontal */}
+            <div style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(3, 1fr)",
+                gap: "2rem",
+                marginBottom: "3rem"
+            }}>
+                <StatCard
+                    title="총 학생 수"
+                    value={studentCount.count}
+                    unit="명"
+                    icon={<Users size={32} />}
+                    desc="활성 계정 수"
+                    color="var(--color-primary)"
+                />
+                <StatCard
+                    title="상장 주식"
+                    value={stockCount.count}
+                    unit="개"
+                    icon={<TrendingUp size={32} />}
+                    desc="거래 가능한 종목"
+                    color="var(--color-secondary)"
+                />
+                <StatCard
+                    title="경제 규모"
+                    value={totalAssets.toLocaleString()}
+                    unit="₩"
+                    icon={<Coins size={32} />}
+                    desc="학생 총 자산"
+                    color="var(--color-success)"
+                />
+            </div>
+
+            {/* Quick Actions Only */}
+            <div className="card">
+                <h2 style={{ fontSize: "1.5rem", fontWeight: "700", marginBottom: "1.5rem" }}>빠른 실행</h2>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+                    <a href="/teacher/students" className="btn btn-outline" style={{ padding: "1.5rem" }}>
+                        학생 계정 생성
+                    </a>
+                    <a href="/teacher/market" className="btn btn-outline" style={{ padding: "1.5rem" }}>
+                        새 종목 상장
+                    </a>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+function StatCard({ title, value, unit, icon, desc, color }: any) {
+    return (
+        <div className="card geometric-bg" style={{ position: "relative", overflow: "hidden" }}>
+            <div style={{ position: "relative", zIndex: 1 }}>
+                <div style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "flex-start",
+                    marginBottom: "1.5rem"
+                }}>
+                    <div>
+                        <p className="stat-label">{title}</p>
+                    </div>
+                    <div style={{
+                        padding: "0.75rem",
+                        background: `${color}15`,
+                        borderRadius: "var(--radius-md)",
+                        color: color
+                    }}>
+                        {icon}
+                    </div>
+                </div>
+
+                <div style={{ display: "flex", alignItems: "baseline", gap: "0.5rem", marginBottom: "0.75rem" }}>
+                    {unit === "₩" && <span style={{ fontSize: "2rem", fontWeight: "700", color }}>₩</span>}
+                    <h3 className="stat-number">{value}</h3>
+                    {unit !== "₩" && <span style={{ fontSize: "2rem", fontWeight: "700", color }}>{unit}</span>}
+                </div>
+
+                <p style={{ fontSize: "0.875rem", color: "var(--color-text-muted)" }}>{desc}</p>
+            </div>
+        </div>
+    );
+}
