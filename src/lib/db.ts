@@ -1,12 +1,22 @@
 import Database from 'better-sqlite3';
 import path from 'path';
 
-const dbPath = path.join(process.cwd(), 'stock.db');
-const db = new Database(dbPath);
+// 전역 객체에 DB 인스턴스를 저장하여 HMR 시 재사용 (싱글톤)
+const globalForDb = globalThis as unknown as {
+  db: Database.Database | undefined;
+};
 
-// 데이터베이스 초기화
+const dbPath = path.join(process.cwd(), 'stock.db');
+
+export const db = globalForDb.db ?? new Database(dbPath);
+
+// 성능 및 동시성 향상을 위한 설정
+db.pragma('journal_mode = WAL');
+db.pragma('busy_timeout = 5000'); // 5초 대기
+
+// 스키마 초기화
 function initDatabase() {
-    db.exec(`
+  db.exec(`
     CREATE TABLE IF NOT EXISTS teachers (
       id TEXT PRIMARY KEY,
       username TEXT UNIQUE NOT NULL,
@@ -61,12 +71,23 @@ function initDatabase() {
   `);
 }
 
-// 앱 시작 시 DB 초기화
-initDatabase();
+// 최초 실행 시에만 초기화
+if (!globalForDb.db) {
+  initDatabase();
+}
+
+if (process.env.NODE_ENV !== 'production') {
+  globalForDb.db = db;
+}
 
 export default db;
 
-// UUID 생성 헬퍼
+// UUID 생성 헬퍼 (호환성 확보)
 export function generateId() {
+  // Node 19+ or Browser
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
     return crypto.randomUUID();
+  }
+  // Fallback
+  return Date.now().toString(36) + Math.random().toString(36).substring(2);
 }
