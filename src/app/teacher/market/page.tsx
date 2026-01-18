@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -120,7 +121,6 @@ export default function MarketManagementPage() {
                     display: 'flex',
                     alignItems: 'center',
                     gap: '1.5rem',
-                    background: '#f8fafc',
                     padding: '1.5rem',
                     borderRadius: '16px',
                     border: '1px solid #e2e8f0'
@@ -182,7 +182,7 @@ export default function MarketManagementPage() {
                             else alert(json.message || "오류 발생");
                         }}
                         style={{
-                            background: 'transparent',
+                          
                             border: 'none',
                             color: '#059669', // Emerald 600
                             background: '#ecfdf5', // Emerald 50
