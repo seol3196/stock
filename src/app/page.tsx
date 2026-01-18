@@ -27,7 +27,8 @@ export default function LoginPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "로그인 실패");
 
-      router.push(role === "teacher" ? "/teacher" : "/student");
+      // Use window.location for reliable redirect in production
+      window.location.href = role === "teacher" ? "/teacher" : "/student";
     } catch (err: any) {
       setError(err.message);
     } finally {
