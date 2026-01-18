@@ -68,3 +68,25 @@ export async function PUT(request: Request) {
         return NextResponse.json({ error: "Failed to update stock" }, { status: 500 });
     }
 }
+
+export async function DELETE(request: Request) {
+    const session = await getSession();
+    if (!session || session.role !== "teacher") {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    try {
+        const { id } = await request.json();
+
+        // Delete stock ownership records first (foreign key constraint)
+        db.prepare('DELETE FROM stock_ownership WHERE stock_id = ?').run(id);
+
+        // Delete the stock
+        db.prepare('DELETE FROM stocks WHERE id = ? AND teacher_id = ?').run(id, session.id as string);
+
+        return NextResponse.json({ success: true });
+    } catch (e) {
+        console.error(e);
+        return NextResponse.json({ error: "Failed to delete stock" }, { status: 500 });
+    }
+}

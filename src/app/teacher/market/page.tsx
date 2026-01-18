@@ -84,6 +84,30 @@ export default function MarketManagementPage() {
         alert("금리가 수정되었습니다!");
     };
 
+    const handleDeleteStock = async (id: string, name: string) => {
+        if (!confirm(`"${name}" 종목을 상장폐지하시겠습니까?\n\n⚠️ 학생들이 보유한 해당 주식도 모두 삭제됩니다.`)) {
+            return;
+        }
+
+        try {
+            const res = await fetch("/api/teacher/stocks", {
+                method: "DELETE",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ id }),
+            });
+
+            if (!res.ok) {
+                throw new Error("상장폐지 실패");
+            }
+
+            alert("상장폐지 완료!");
+            fetchData();
+        } catch (e: any) {
+            alert(e.message);
+        }
+    };
+
+
     return (
         // Main Container Text Color Fixed for Light Theme
         <div style={{ color: '#0f172a' }}>
@@ -182,7 +206,7 @@ export default function MarketManagementPage() {
                             else alert(json.message || "오류 발생");
                         }}
                         style={{
-                          
+
                             border: 'none',
                             color: '#059669', // Emerald 600
                             background: '#ecfdf5', // Emerald 50
@@ -281,6 +305,34 @@ export default function MarketManagementPage() {
                                 />
                             </div>
                             <p style={{ fontSize: '0.75rem', color: '#94a3b8', textAlign: 'right', marginTop: '0.5rem' }}>엔터키로 즉시 반영</p>
+
+                            {/* Delete Button */}
+                            <button
+                                onClick={() => handleDeleteStock(stock.id, stock.name)}
+                                style={{
+                                    width: '100%',
+                                    marginTop: '1rem',
+                                    padding: '0.75rem',
+                                    background: '#fef2f2',
+                                    border: '1px solid #fee2e2',
+                                    borderRadius: '10px',
+                                    color: '#dc2626',
+                                    fontSize: '0.9rem',
+                                    fontWeight: '600',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.2s'
+                                }}
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.background = '#fee2e2';
+                                    e.currentTarget.style.borderColor = '#fca5a5';
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.background = '#fef2f2';
+                                    e.currentTarget.style.borderColor = '#fee2e2';
+                                }}
+                            >
+                                🗑️ 상장폐지
+                            </button>
                         </div>
                     </div>
                 ))}
