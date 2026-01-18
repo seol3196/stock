@@ -41,9 +41,10 @@ export async function setSession(token: string) {
     const cookieStore = await cookies();
     cookieStore.set("session", token, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
+        secure: false, // Allow HTTP for local network deployment
         maxAge: 60 * 60 * 24, // 1 day
         path: "/",
+        sameSite: "lax",
     });
 }
 
