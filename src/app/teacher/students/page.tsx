@@ -198,15 +198,17 @@ export default function StudentManagementPage() {
 
     return (
         <div style={{ color: '#0f172a' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2rem' }}>
-                <h1 style={{ fontSize: '2rem', fontWeight: '800' }}>학생 관리</h1>
-                <div style={{ display: 'flex', gap: '1rem' }}>
-                    <button onClick={() => setShowBatchModal(true)} style={{ background: 'white', color: '#2563eb', border: '1px solid #bfdbfe', padding: '0.8rem 1.5rem', borderRadius: '12px', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
-                        <Users size={20} /> 일괄 등록
-                    </button>
-                    <button onClick={() => setShowAddModal(true)} style={{ background: '#2563eb', color: 'white', border: 'none', padding: '0.8rem 1.5rem', borderRadius: '12px', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
-                        <UserPlus size={20} /> 개별 등록
-                    </button>
+            <div className="header-section" style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '2rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+                    <h1 className="page-title" style={{ fontSize: 'clamp(1.5rem, 4vw, 2rem)', fontWeight: '800', margin: 0 }}>학생 관리</h1>
+                    <div className="button-group" style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                        <button onClick={() => setShowBatchModal(true)} className="btn-secondary" style={{ background: 'white', color: '#2563eb', border: '1px solid #bfdbfe', padding: '0.75rem 1.25rem', borderRadius: '12px', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', fontSize: '0.9rem', whiteSpace: 'nowrap' }}>
+                            <Users size={18} /> 일괄 등록
+                        </button>
+                        <button onClick={() => setShowAddModal(true)} className="btn-primary" style={{ background: '#2563eb', color: 'white', border: 'none', padding: '0.75rem 1.25rem', borderRadius: '12px', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', fontSize: '0.9rem', whiteSpace: 'nowrap' }}>
+                            <UserPlus size={18} /> 개별 등록
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -216,15 +218,15 @@ export default function StudentManagementPage() {
                     style={{ width: '100%', padding: '1rem 1rem 1rem 3rem', fontSize: '1rem', border: '1px solid #e2e8f0', borderRadius: '16px', outline: 'none' }} />
             </div>
 
-            <div style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: '20px', overflow: 'hidden' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            {/* Table wrapper with horizontal scroll for mobile */}
+            <div className="table-wrapper" style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: '20px', overflow: 'auto', WebkitOverflowScrolling: 'touch' }}>
+                <table style={{ width: '100%', minWidth: '600px', borderCollapse: 'collapse' }}>
                     <thead>
                         <tr style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
-                            <th style={{ padding: '1rem', textAlign: 'left', color: '#64748b' }}>이름 / ID</th>
-                            <th style={{ padding: '1rem', textAlign: 'right', color: '#64748b' }}>현금</th>
-                            <th style={{ padding: '1rem', textAlign: 'right', color: '#64748b' }}>총 자산</th>
-                            <th style={{ padding: '1rem', textAlign: 'center', color: '#64748b', width: '150px' }}>자산 변경</th>
-                            <th style={{ padding: '1rem', textAlign: 'center', color: '#64748b', width: '150px' }}>관리</th>
+                            <th style={{ padding: '1rem', textAlign: 'left', color: '#64748b', fontSize: 'clamp(0.8rem, 2vw, 1rem)' }}>이름 / ID</th>
+                            <th style={{ padding: '1rem', textAlign: 'right', color: '#64748b', fontSize: 'clamp(0.8rem, 2vw, 1rem)' }}>총 자산</th>
+                            <th style={{ padding: '1rem', textAlign: 'center', color: '#64748b', width: '120px', fontSize: 'clamp(0.8rem, 2vw, 1rem)' }}>자산관리</th>
+                            <th style={{ padding: '1rem', textAlign: 'center', color: '#64748b', width: '120px', fontSize: 'clamp(0.8rem, 2vw, 1rem)' }}>계정관리</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -233,27 +235,26 @@ export default function StudentManagementPage() {
                             const total = (s.cash || 0) + (s.savingsBalance || 0) + stockVal;
                             return (
                                 <tr key={s.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                                    <td style={{ padding: '1.25rem' }}>
-                                        <div style={{ fontWeight: 'bold' }}>{s.name}</div>
-                                        <div style={{ color: '#94a3b8', fontSize: '0.9rem' }}>@{s.username}</div>
+                                    <td style={{ padding: 'clamp(0.75rem, 2vw, 1.25rem)' }}>
+                                        <div style={{ fontWeight: 'bold', fontSize: 'clamp(0.9rem, 2vw, 1rem)' }}>{s.name}</div>
+                                        <div style={{ color: '#94a3b8', fontSize: 'clamp(0.75rem, 1.5vw, 0.9rem)' }}>@{s.username}</div>
                                     </td>
-                                    <td style={{ padding: '1.25rem', textAlign: 'right', fontFamily: 'monospace', fontSize: '1rem' }}>{s.cash?.toLocaleString()}</td>
-                                    <td style={{ padding: '1.25rem', textAlign: 'right', fontFamily: 'monospace', fontWeight: 'bold', color: '#2563eb', fontSize: '1.1rem' }}>{total.toLocaleString()}</td>
-                                    <td style={{ padding: '1.25rem', textAlign: 'center' }}>
-                                        <button onClick={() => openAssetModal(s)} style={{ padding: '0.5rem 1rem', background: '#eff6ff', color: '#2563eb', border: '1px solid #bfdbfe', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
-                                            <Wallet size={16} /> 자산
+                                    <td style={{ padding: 'clamp(0.75rem, 2vw, 1.25rem)', textAlign: 'right', fontFamily: 'monospace', fontWeight: 'bold', color: '#2563eb', fontSize: 'clamp(0.9rem, 2vw, 1.1rem)' }}>{total.toLocaleString()}</td>
+                                    <td style={{ padding: 'clamp(0.75rem, 2vw, 1.25rem)', textAlign: 'center' }}>
+                                        <button onClick={() => openAssetModal(s)} style={{ padding: '0.5rem 0.75rem', background: '#eff6ff', color: '#2563eb', border: '1px solid #bfdbfe', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', display: 'inline-flex', alignItems: 'center', gap: '5px', fontSize: 'clamp(0.75rem, 1.5vw, 0.9rem)', whiteSpace: 'nowrap' }}>
+                                            <Wallet size={14} /> 자산
                                         </button>
                                     </td>
-                                    <td style={{ padding: '1.25rem', textAlign: 'center' }}>
-                                        <div style={{ display: 'flex', justifyContent: 'center', gap: '0.5rem' }}>
-                                            <button onClick={() => setAccountModalData(s)} style={{ padding: '0.5rem', background: 'white', border: '1px solid #e2e8f0', borderRadius: '8px', cursor: 'pointer' }}><Settings size={18} /></button>
-                                            <button onClick={() => handleDeleteStudent(s.id, s.name)} style={{ padding: '0.5rem', background: '#fef2f2', border: '1px solid #fee2e2', borderRadius: '8px', color: '#ef4444', cursor: 'pointer' }}><Trash2 size={18} /></button>
+                                    <td style={{ padding: 'clamp(0.75rem, 2vw, 1.25rem)', textAlign: 'center' }}>
+                                        <div style={{ display: 'flex', justifyContent: 'center', gap: '0.25rem' }}>
+                                            <button onClick={() => setAccountModalData(s)} style={{ padding: '0.5rem 0.75rem', background: 'white', border: '1px solid #e2e8f0', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', display: 'inline-flex', alignItems: 'center', gap: '5px', fontSize: 'clamp(0.75rem, 1.5vw, 0.9rem)' }}><Settings size={14} /> 계정</button>
+                                            <button onClick={() => handleDeleteStudent(s.id, s.name)} style={{ padding: '0.4rem', background: '#fef2f2', border: '1px solid #fee2e2', borderRadius: '8px', color: '#ef4444', cursor: 'pointer' }}><Trash2 size={16} /></button>
                                         </div>
                                     </td>
                                 </tr>
                             )
                         }) : (
-                            <tr><td colSpan={5} style={{ padding: '3rem', textAlign: 'center', color: '#94a3b8' }}>{loading ? "로딩 중..." : "학생이 없습니다."}</td></tr>
+                            <tr><td colSpan={4} style={{ padding: '3rem', textAlign: 'center', color: '#94a3b8' }}>{loading ? "로딩 중..." : "학생이 없습니다."}</td></tr>
                         )}
                     </tbody>
                 </table>
@@ -261,8 +262,8 @@ export default function StudentManagementPage() {
 
             {/* Asset Modal */}
             {assetModalData && (
-                <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <div style={{ background: 'white', padding: '2rem', borderRadius: '16px', width: '600px', maxHeight: '90vh', overflowY: 'auto' }}>
+                <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>
+                    <div style={{ background: 'white', padding: 'clamp(1rem, 3vw, 2rem)', borderRadius: '16px', width: '100%', maxWidth: '600px', maxHeight: '90vh', overflowY: 'auto' }}>
                         <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '1.5rem' }}>자산 수정 ({assetModalData.name})</h2>
                         <form onSubmit={handleUpdateAsset}>
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.5rem' }}>
@@ -301,8 +302,8 @@ export default function StudentManagementPage() {
 
             {/* Account Modal */}
             {accountModalData && (
-                <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <div style={{ background: 'white', padding: '2rem', borderRadius: '16px', width: '400px' }}>
+                <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>
+                    <div style={{ background: 'white', padding: 'clamp(1rem, 3vw, 2rem)', borderRadius: '16px', width: '100%', maxWidth: '400px' }}>
                         <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '1.5rem' }}>정보 수정</h2>
                         <form onSubmit={handleUpdateAccount}>
                             <div style={{ marginBottom: '1rem' }}>
@@ -324,8 +325,8 @@ export default function StudentManagementPage() {
 
             {/* Batch Modal */}
             {showBatchModal && (
-                <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <div style={{ background: 'white', padding: '2rem', borderRadius: '16px', width: '800px', maxHeight: '90vh', overflowY: 'auto' }}>
+                <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>
+                    <div style={{ background: 'white', padding: 'clamp(1rem, 3vw, 2rem)', borderRadius: '16px', width: '100%', maxWidth: '800px', maxHeight: '90vh', overflowY: 'auto' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
                             <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>일괄 등록 ({batchStep}/2)</h2>
                             <button onClick={() => setShowBatchModal(false)} style={{ background: 'none', border: 'none', cursor: 'pointer' }}><X /></button>
@@ -379,8 +380,8 @@ export default function StudentManagementPage() {
 
             {/* Single Add Modal */}
             {showAddModal && (
-                <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <div style={{ background: 'white', padding: '2rem', borderRadius: '16px', width: '400px' }}>
+                <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>
+                    <div style={{ background: 'white', padding: 'clamp(1rem, 3vw, 2rem)', borderRadius: '16px', width: '100%', maxWidth: '400px' }}>
                         <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '1rem' }}>개별 등록</h2>
                         <form onSubmit={handleAddStudent} style={{ display: 'grid', gap: '1rem' }}>
                             <input placeholder="이름" value={newStudent.name} onChange={e => setNewStudent({ ...newStudent, name: e.target.value })} style={{ padding: '0.8rem', border: '1px solid #e2e8f0', borderRadius: '8px' }} />

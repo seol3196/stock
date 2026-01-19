@@ -458,32 +458,116 @@ h6 {
 }
 
 /* Responsive */
+@media (max-width: 1024px) {
+  .container {
+    padding: 0 var(--spacing-lg);
+  }
+
+  .grid-cols-3,
+  .grid-cols-4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
 @media (max-width: 768px) {
+  :root {
+    --spacing-xl: 1.5rem;
+    --spacing-2xl: 2rem;
+    --spacing-3xl: 2.5rem;
+  }
+
   h1 {
-    font-size: 2.5rem;
-  }
-
-  h2 {
-    font-size: 2rem;
-  }
-
-  h3 {
     font-size: 1.75rem;
   }
 
+  h2 {
+    font-size: 1.5rem;
+  }
+
+  h3 {
+    font-size: 1.25rem;
+  }
+
+  h4 {
+    font-size: 1.125rem;
+  }
+
   .stat-number {
-    font-size: 3rem;
+    font-size: clamp(2rem, 8vw, 2.5rem);
   }
 
   .glass-panel,
   .card {
-    padding: var(--spacing-lg);
+    padding: var(--spacing-md);
+    border-radius: var(--radius-md);
+  }
+
+  .container {
+    padding: 0 var(--spacing-md);
   }
 
   .grid-cols-2,
   .grid-cols-3,
   .grid-cols-4 {
     grid-template-columns: 1fr;
+  }
+
+  .btn {
+    padding: 0.75rem 1.5rem;
+    font-size: 0.9rem;
+  }
+
+  .btn-sm {
+    padding: 0.5rem 1rem;
+    font-size: 0.8rem;
+  }
+
+  .btn-lg {
+    padding: 1rem 2rem;
+    font-size: 1rem;
+  }
+
+  .input {
+    padding: 0.875rem 1rem;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  :root {
+    --spacing-xl: 1rem;
+    --spacing-2xl: 1.5rem;
+    --spacing-3xl: 2rem;
+  }
+
+  h1 {
+    font-size: 1.5rem;
+  }
+
+  h2 {
+    font-size: 1.25rem;
+  }
+
+  h3 {
+    font-size: 1.125rem;
+  }
+
+  .stat-number {
+    font-size: clamp(1.5rem, 7vw, 2rem);
+  }
+
+  .glass-panel,
+  .card {
+    padding: var(--spacing-sm);
+  }
+
+  .container {
+    padding: 0 var(--spacing-sm);
+  }
+
+  .btn {
+    padding: 0.625rem 1.25rem;
+    font-size: 0.875rem;
   }
 }
 

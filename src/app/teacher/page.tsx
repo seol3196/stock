@@ -30,15 +30,10 @@ export default async function TeacherDashboard() {
 
     return (
         <div>
-            <h1 style={{ fontSize: "3rem", fontWeight: "800", marginBottom: "3rem" }}>대시보드</h1>
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-extrabold mb-6 md:mb-8 lg:mb-12">대시보드</h1>
 
             {/* Stats Grid - Horizontal */}
-            <div style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(3, 1fr)",
-                gap: "2rem",
-                marginBottom: "3rem"
-            }}>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8 mb-8 md:mb-12">
                 <StatCard
                     title="총 학생 수"
                     value={studentCount.count}
@@ -68,7 +63,7 @@ export default async function TeacherDashboard() {
             {/* Quick Actions Only */}
             <div className="card">
                 <h2 style={{ fontSize: "1.5rem", fontWeight: "700", marginBottom: "1.5rem" }}>빠른 실행</h2>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <a href="/teacher/students" className="btn btn-outline" style={{ padding: "1.5rem" }}>
                         학생 계정 생성
                     </a>

@@ -1,11 +1,12 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { BarChart3, TrendingUp, Landmark, LogOut } from "lucide-react";
-import { ReactNode } from "react";
+import { BarChart3, TrendingUp, Landmark, LogOut, Menu, X } from "lucide-react";
+import { ReactNode, useState } from "react";
 
 export default function StudentLayout({ children }: { children: ReactNode }) {
     const router = useRouter();
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     const handleLogout = async () => {
         await fetch("/api/logout");
@@ -14,17 +15,43 @@ export default function StudentLayout({ children }: { children: ReactNode }) {
 
     return (
         <div style={{ display: "flex", minHeight: "100vh", background: "var(--color-background)" }}>
+            {/* Mobile Menu Button */}
+            <button
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                style={{
+                    display: "none",
+                    position: "fixed",
+                    top: "1rem",
+                    left: "1rem",
+                    zIndex: 1001,
+                    background: "white",
+                    border: "2px solid var(--color-border)",
+                    borderRadius: "var(--radius-md)",
+                    padding: "0.75rem",
+                    cursor: "pointer",
+                    boxShadow: "0 2px 8px rgba(0,0,0,0.1)"
+                }}
+                className="mobile-menu-btn"
+            >
+                {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+
             {/* Sidebar */}
-            <aside style={{
-                width: "280px",
-                background: "white",
-                borderRight: "1px solid var(--color-border)",
-                padding: "2rem 0",
-                position: "fixed",
-                height: "100vh",
-                left: 0,
-                top: 0
-            }}>
+            <aside
+                style={{
+                    width: "280px",
+                    background: "white",
+                    borderRight: "1px solid var(--color-border)",
+                    padding: "2rem 0",
+                    position: "fixed",
+                    height: "100vh",
+                    left: 0,
+                    top: 0,
+                    zIndex: 1000,
+                    transition: "transform 0.3s ease"
+                }}
+                className={`sidebar ${mobileMenuOpen ? 'mobile-open' : ''}`}
+            >
                 <div style={{ padding: "0 1.5rem", marginBottom: "3rem" }}>
                     <h1 style={{
                         fontSize: "1.75rem",
@@ -42,9 +69,9 @@ export default function StudentLayout({ children }: { children: ReactNode }) {
                 </div>
 
                 <nav style={{ display: "flex", flexDirection: "column", gap: "0.75rem", padding: "0 1rem" }}>
-                    <NavLink href="/student" icon={<BarChart3 size={24} />} label="내 포트폴리오" />
-                    <NavLink href="/student/trade" icon={<TrendingUp size={24} />} label="주식 거래소" />
-                    <NavLink href="/student/bank" icon={<Landmark size={24} />} label="은행 & 저축" />
+                    <NavLink href="/student" icon={<BarChart3 size={24} />} label="내 포트폴리오" onClick={() => setMobileMenuOpen(false)} />
+                    <NavLink href="/student/trade" icon={<TrendingUp size={24} />} label="주식 거래소" onClick={() => setMobileMenuOpen(false)} />
+                    <NavLink href="/student/bank" icon={<Landmark size={24} />} label="은행 & 저축" onClick={() => setMobileMenuOpen(false)} />
                 </nav>
 
                 <div style={{ position: "absolute", bottom: "2rem", width: "100%", padding: "0 1rem" }}>
@@ -73,20 +100,67 @@ export default function StudentLayout({ children }: { children: ReactNode }) {
                 </div>
             </aside>
 
+            {/* Mobile Overlay */}
+            {mobileMenuOpen && (
+                <div
+                    onClick={() => setMobileMenuOpen(false)}
+                    style={{
+                        display: "none",
+                        position: "fixed",
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        background: "rgba(0,0,0,0.5)",
+                        zIndex: 999
+                    }}
+                    className="mobile-overlay"
+                />
+            )}
+
             {/* Main Content */}
-            <main style={{ marginLeft: "280px", flex: 1 }}>
-                <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "3rem" }}>
+            <main className="main-content" style={{ marginLeft: "280px", flex: 1 }}>
+                <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "3rem" }} className="main-content-inner">
                     {children}
                 </div>
             </main>
+
+            <style jsx>{`
+                @media (max-width: 768px) {
+                    .mobile-menu-btn {
+                        display: block !important;
+                    }
+                    
+                    .sidebar {
+                        transform: translateX(-100%);
+                    }
+                    
+                    .sidebar.mobile-open {
+                        transform: translateX(0);
+                    }
+                    
+                    .mobile-overlay {
+                        display: block !important;
+                    }
+                    
+                    .main-content {
+                        margin-left: 0 !important;
+                    }
+                    
+                    .main-content-inner {
+                        padding: 5rem 1rem 2rem 1rem !important;
+                    }
+                }
+            `}</style>
         </div>
     );
 }
 
-function NavLink({ href, icon, label }: { href: string; icon: ReactNode; label: string }) {
+function NavLink({ href, icon, label, onClick }: { href: string; icon: ReactNode; label: string; onClick?: () => void }) {
     return (
         <a
             href={href}
+            onClick={onClick}
             style={{
                 display: "flex",
                 alignItems: "center",

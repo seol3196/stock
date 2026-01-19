@@ -50,7 +50,7 @@ export default function LoginPage() {
       alignItems: 'center',
       justifyContent: 'center',
       fontFamily: "'Inter', sans-serif",
-      padding: '1rem',
+      padding: 'clamp(0.5rem, 2vw, 1rem)',
       position: 'relative',
       overflow: 'hidden',
       color: '#0f172a'
@@ -70,22 +70,22 @@ export default function LoginPage() {
       <div style={{
         width: '100%', maxWidth: '400px', position: 'relative', zIndex: 10
       }}>
-        <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
+        <div style={{ textAlign: 'center', marginBottom: 'clamp(1.5rem, 4vw, 2.5rem)' }}>
           <h1 style={{
-            fontSize: '2.5rem', fontWeight: '900', color: '#0f172a', marginBottom: '0.5rem',
+            fontSize: 'clamp(1.75rem, 6vw, 2.5rem)', fontWeight: '900', color: '#0f172a', marginBottom: '0.5rem',
             letterSpacing: '-1px'
           }}>
             모의 주식 프로젝트
           </h1>
-          <p style={{ color: '#64748b', fontSize: '1rem', fontWeight: '600' }}>우리 반 주식 투자 시뮬레이션</p>
+          <p style={{ color: '#64748b', fontSize: 'clamp(0.875rem, 2.5vw, 1rem)', fontWeight: '600' }}>우리 반 주식 투자 시뮬레이션</p>
         </div>
 
         <div style={{
           background: 'rgba(255, 255, 255, 0.8)',
           backdropFilter: 'blur(20px)',
           border: '1px solid rgba(255, 255, 255, 0.5)',
-          borderRadius: '24px',
-          padding: '2.5rem',
+          borderRadius: 'clamp(16px, 4vw, 24px)',
+          padding: 'clamp(1.5rem, 4vw, 2.5rem)',
           boxShadow: '0 20px 40px -10px rgba(0, 0, 0, 0.05)'
         }}>
           {/* Role Switcher */}
