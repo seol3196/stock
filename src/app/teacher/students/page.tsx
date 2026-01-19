@@ -223,8 +223,8 @@ export default function StudentManagementPage() {
                 <table style={{ width: '100%', minWidth: '600px', borderCollapse: 'collapse' }}>
                     <thead>
                         <tr style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
-                            <th style={{ padding: '1rem', textAlign: 'left', color: '#64748b', fontSize: 'clamp(0.8rem, 2vw, 1rem)' }}>이름 / ID</th>
-                            <th style={{ padding: '1rem', textAlign: 'right', color: '#64748b', fontSize: 'clamp(0.8rem, 2vw, 1rem)' }}>총 자산</th>
+                            <th style={{ padding: '1rem', textAlign: 'left', color: '#64748b', fontSize: 'clamp(0.8rem, 2vw, 1rem)', width: '140px' }}>이름 / ID</th>
+                            <th style={{ padding: '1rem', textAlign: 'left', color: '#64748b', fontSize: 'clamp(0.8rem, 2vw, 1rem)', width: '130px' }}>총 자산</th>
                             <th style={{ padding: '1rem', textAlign: 'center', color: '#64748b', width: '120px', fontSize: 'clamp(0.8rem, 2vw, 1rem)' }}>자산관리</th>
                             <th style={{ padding: '1rem', textAlign: 'center', color: '#64748b', width: '120px', fontSize: 'clamp(0.8rem, 2vw, 1rem)' }}>계정관리</th>
                         </tr>
@@ -235,11 +235,11 @@ export default function StudentManagementPage() {
                             const total = (s.cash || 0) + (s.savingsBalance || 0) + stockVal;
                             return (
                                 <tr key={s.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                                    <td style={{ padding: 'clamp(0.75rem, 2vw, 1.25rem)' }}>
+                                    <td style={{ padding: 'clamp(0.75rem, 2vw, 1.25rem)', width: '140px' }}>
                                         <div style={{ fontWeight: 'bold', fontSize: 'clamp(0.9rem, 2vw, 1rem)' }}>{s.name}</div>
                                         <div style={{ color: '#94a3b8', fontSize: 'clamp(0.75rem, 1.5vw, 0.9rem)' }}>@{s.username}</div>
                                     </td>
-                                    <td style={{ padding: 'clamp(0.75rem, 2vw, 1.25rem)', textAlign: 'right', fontFamily: 'monospace', fontWeight: 'bold', color: '#2563eb', fontSize: 'clamp(0.9rem, 2vw, 1.1rem)' }}>{total.toLocaleString()}</td>
+                                    <td style={{ padding: 'clamp(0.75rem, 2vw, 1.25rem)', textAlign: 'left', fontFamily: 'monospace', fontWeight: 'bold', color: '#2563eb', fontSize: 'clamp(0.9rem, 2vw, 1.1rem)', width: '130px' }}>{total.toLocaleString()}</td>
                                     <td style={{ padding: 'clamp(0.75rem, 2vw, 1.25rem)', textAlign: 'center' }}>
                                         <button onClick={() => openAssetModal(s)} style={{ padding: '0.5rem 0.75rem', background: '#eff6ff', color: '#2563eb', border: '1px solid #bfdbfe', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', display: 'inline-flex', alignItems: 'center', gap: '5px', fontSize: 'clamp(0.75rem, 1.5vw, 0.9rem)', whiteSpace: 'nowrap' }}>
                                             <Wallet size={14} /> 자산

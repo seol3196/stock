@@ -2,11 +2,24 @@
 
 import { useRouter } from "next/navigation";
 import { Home, Users, TrendingUp, LogOut, Menu, X } from "lucide-react";
-import { ReactNode, useState } from "react";
+import { ReactNode, useState, useEffect } from "react";
 
 export default function TeacherLayout({ children }: { children: ReactNode }) {
     const router = useRouter();
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const [username, setUsername] = useState<string>("");
+
+    // Fetch user session on mount
+    useEffect(() => {
+        fetch('/api/session')
+            .then(res => res.json())
+            .then(data => {
+                if (data.username) {
+                    setUsername(data.username);
+                }
+            })
+            .catch(() => { });
+    }, []);
 
     const handleLogout = async () => {
         await fetch("/api/logout");
@@ -52,7 +65,7 @@ export default function TeacherLayout({ children }: { children: ReactNode }) {
                 }}
                 className={`sidebar ${mobileMenuOpen ? 'mobile-open' : ''}`}
             >
-                <div style={{ padding: "0 1.5rem", marginBottom: "3rem" }}>
+                <div style={{ padding: "0 1.5rem", marginBottom: "2rem" }}>
                     <h1 style={{
                         fontSize: "1.5rem",
                         fontWeight: "800",
@@ -66,6 +79,19 @@ export default function TeacherLayout({ children }: { children: ReactNode }) {
                     <p style={{ fontSize: "0.875rem", color: "var(--color-text-muted)", marginTop: "0.25rem" }}>
                         Classroom Stock Market
                     </p>
+                    {username && (
+                        <p style={{
+                            fontSize: "0.875rem",
+                            fontWeight: "600",
+                            color: "#1e40af",
+                            marginTop: "0.75rem",
+                            padding: "0.5rem",
+                            background: "#eff6ff",
+                            borderRadius: "var(--radius-sm)"
+                        }}>
+                            {username}님 안녕하세요
+                        </p>
+                    )}
                 </div>
 
                 <nav style={{ display: "flex", flexDirection: "column", gap: "0.5rem", padding: "0 1rem" }}>

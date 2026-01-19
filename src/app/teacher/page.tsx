@@ -62,12 +62,12 @@ export default async function TeacherDashboard() {
 
             {/* Quick Actions Only */}
             <div className="card">
-                <h2 style={{ fontSize: "1.5rem", fontWeight: "700", marginBottom: "1.5rem" }}>빠른 실행</h2>
+                <h2 style={{ fontSize: "clamp(1.125rem, 3vw, 1.5rem)", fontWeight: "700", marginBottom: "1rem" }}>빠른 실행</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <a href="/teacher/students" className="btn btn-outline" style={{ padding: "1.5rem" }}>
+                    <a href="/teacher/students" className="btn btn-outline" style={{ padding: "clamp(0.75rem, 2vw, 1rem)", fontSize: "clamp(0.875rem, 2vw, 1rem)" }}>
                         학생 계정 생성
                     </a>
-                    <a href="/teacher/market" className="btn btn-outline" style={{ padding: "1.5rem" }}>
+                    <a href="/teacher/market" className="btn btn-outline" style={{ padding: "clamp(0.75rem, 2vw, 1rem)", fontSize: "clamp(0.875rem, 2vw, 1rem)" }}>
                         새 종목 상장
                     </a>
                 </div>
@@ -78,34 +78,55 @@ export default async function TeacherDashboard() {
 
 function StatCard({ title, value, unit, icon, desc, color }: any) {
     return (
-        <div className="card geometric-bg" style={{ position: "relative", overflow: "hidden" }}>
+        <div className="card" style={{ position: "relative", overflow: "hidden" }}>
             <div style={{ position: "relative", zIndex: 1 }}>
+                {/* Mobile-optimized horizontal layout */}
                 <div style={{
                     display: "flex",
                     justifyContent: "space-between",
-                    alignItems: "flex-start",
-                    marginBottom: "1.5rem"
+                    alignItems: "center",
+                    gap: "clamp(0.75rem, 2vw, 1rem)"
                 }}>
-                    <div>
-                        <p className="stat-label">{title}</p>
+                    {/* Left: Label and Value */}
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                        <p style={{
+                            fontSize: "clamp(0.7rem, 2vw, 0.875rem)",
+                            fontWeight: "600",
+                            textTransform: "uppercase",
+                            letterSpacing: "0.05em",
+                            color: "var(--color-text-muted)",
+                            marginBottom: "clamp(0.25rem, 1vw, 0.5rem)"
+                        }}>{title}</p>
+
+                        <div style={{ display: "flex", alignItems: "baseline", gap: "0.25rem", flexWrap: "wrap", marginBottom: "clamp(0.25rem, 1vw, 0.5rem)" }}>
+                            {unit === "₩" && <span style={{ fontSize: "clamp(1rem, 3vw, 1.5rem)", fontWeight: "700", color }}></span>}
+                            <h3 style={{
+                                fontSize: "clamp(1.5rem, 5vw, 2.25rem)",
+                                fontWeight: "800",
+                                lineHeight: 1,
+                                color: color,
+                                margin: 0
+                            }}>{value}</h3>
+                            {unit !== "₩" && <span style={{ fontSize: "clamp(1rem, 3vw, 1.5rem)", fontWeight: "700", color }}>{unit}</span>}
+                        </div>
+
+                        <p style={{ fontSize: "clamp(0.7rem, 1.8vw, 0.875rem)", color: "var(--color-text-muted)" }}>{desc}</p>
                     </div>
+
+                    {/* Right: Icon */}
                     <div style={{
-                        padding: "0.75rem",
+                        padding: "clamp(0.5rem, 1.5vw, 0.75rem)",
                         background: `${color}15`,
                         borderRadius: "var(--radius-md)",
-                        color: color
+                        color: color,
+                        flexShrink: 0,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center"
                     }}>
                         {icon}
                     </div>
                 </div>
-
-                <div style={{ display: "flex", alignItems: "baseline", gap: "0.5rem", marginBottom: "0.75rem" }}>
-                    {unit === "₩" && <span style={{ fontSize: "2rem", fontWeight: "700", color }}>₩</span>}
-                    <h3 className="stat-number">{value}</h3>
-                    {unit !== "₩" && <span style={{ fontSize: "2rem", fontWeight: "700", color }}>{unit}</span>}
-                </div>
-
-                <p style={{ fontSize: "0.875rem", color: "var(--color-text-muted)" }}>{desc}</p>
             </div>
         </div>
     );
