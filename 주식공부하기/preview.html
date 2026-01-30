@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📚 주식고수되기 - 프로토타입</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            min-height: 90vh;
+        }
+
+        /* 왼쪽 사이드바 */
+        .sidebar {
+            background: linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%);
+            padding: 30px 20px;
+            border-right: 2px solid #cbd5e1;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .sidebar-header h1 {
+            font-size: 1.8rem;
+            color: #1e293b;
+            margin-bottom: 8px;
+        }
+
+        .sidebar-header p {
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        /* 목차 섹션 */
+        .toc-section {
+            margin-bottom: 25px;
+        }
+
+        .toc-section-title {
+            font-size: 1rem;
+            font-weight: bold;
+            color: #475569;
+            margin-bottom: 12px;
+            padding: 8px 12px;
+            background: white;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .toc-item {
+            padding: 10px 12px;
+            margin: 6px 0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+        }
+
+        .toc-item:hover {
+            background: white;
+            transform: translateX(5px);
+        }
+
+        .toc-item.active {
+            background: #667eea;
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .toc-item.completed {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .toc-item.completed:hover {
+            background: #bbf7d0;
+        }
+
+        .check-icon {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #cbd5e1;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        .toc-item.completed .check-icon {
+            background: #22c55e;
+            border-color: #22c55e;
+            color: white;
+        }
+
+        .toc-item.active .check-icon {
+            border-color: white;
+        }
+
+        /* 오른쪽 콘텐츠 영역 */
+        .content {
+            padding: 40px 50px;
+            overflow-y: auto;
+            background: #ffffff;
+        }
+
+        .content-header {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .content-header h2 {
+            font-size: 2rem;
+            color: #1e293b;
+            margin-bottom: 10px;
+        }
+
+        .content-header .badge {
+            display: inline-block;
+            padding: 6px 16px;
+            background: #eff6ff;
+            color: #2563eb;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+
+        .content-body {
+            line-height: 1.8;
+            color: #334155;
+            font-size: 1.05rem;
+        }
+
+        .content-body h3 {
+            font-size: 1.5rem;
+            color: #1e293b;
+            margin: 30px 0 15px 0;
+            padding-left: 15px;
+            border-left: 5px solid #667eea;
+        }
+
+        .content-body p {
+            margin: 15px 0;
+        }
+
+        .content-body strong {
+            color: #667eea;
+            font-weight: 700;
+        }
+
+        .content-body blockquote {
+            background: #f1f5f9;
+            border-left: 5px solid #667eea;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+
+        .content-body table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .content-body th {
+            background: #667eea;
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: bold;
+        }
+
+        .content-body td {
+            padding: 15px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .content-body tr:last-child td {
+            border-bottom: none;
+        }
+
+        .content-body tr:hover {
+            background: #f8fafc;
+        }
+
+        /* 네비게이션 버튼 */
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 50px;
+            padding-top: 30px;
+            border-top: 2px solid #e2e8f0;
+        }
+
+        .nav-btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-btn.prev {
+            background: #f1f5f9;
+            color: #475569;
+        }
+
+        .nav-btn.next {
+            background: #667eea;
+            color: white;
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .nav-btn:disabled:hover {
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* 완료 버튼 */
+        .complete-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 30px;
+            transition: all 0.2s;
+        }
+
+        .complete-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(34, 197, 94, 0.4);
+        }
+
+        .complete-btn.completed {
+            background: #cbd5e1;
+            color: #64748b;
+        }
+
+        /* 진도율 표시 */
+        .progress-bar {
+            margin: 20px 0;
+            padding: 15px;
+            background: white;
+            border-radius: 12px;
+        }
+
+        .progress-label {
+            font-size: 0.85rem;
+            color: #64748b;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .progress-track {
+            height: 10px;
+            background: #e2e8f0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 10px;
+            transition: width 0.3s;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                border-right: none;
+                border-bottom: 2px solid #cbd5e1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 왼쪽 사이드바 -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h1>📚 주식고수되기</h1>
+                <p>초등학생을 위한 주식 입문서</p>
+            </div>
+
+            <div class="progress-bar">
+                <div class="progress-label">
+                    <span>학습 진도</span>
+                    <span id="progress-text">0/12 (0%)</span>
+                </div>
+                <div class="progress-track">
+                    <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <div class="toc-section">
+                <div class="toc-section-title">Ⅰ. 메인 학습</div>
+                <div class="toc-item active" data-chapter="1-1">
+                    <span class="check-icon">○</span>
+                    <span>1-1. 총 자산(순자산)</span>
+                </div>
+                <div class="toc-item" data-chapter="1-2">
+                    <span class="check-icon">○</span>
+                    <span>1-2. 지갑 vs 통장</span>
+                </div>
+                <div class="toc-item" data-chapter="1-3">
+                    <span class="check-icon">○</span>
+                    <span>1-3. 주식 평가액</span>
+                </div>
+                <div class="toc-item" data-chapter="1-4">
+                    <span class="check-icon">○</span>
+                    <span>1-4. 시가총액</span>
+                </div>
+                <div class="toc-item" data-chapter="2-1">
+                    <span class="check-icon">○</span>
+                    <span>2-1. 매수와 매도</span>
+                </div>
+                <div class="toc-item" data-chapter="2-2">
+                    <span class="check-icon">○</span>
+                    <span>2-2. 수익과 수익률</span>
+                </div>
+            </div>
+
+            <div class="toc-section">
+                <div class="toc-section-title">Ⅱ. 깊이 읽기</div>
+                <div class="toc-item" data-chapter="essay-1-1">
+                    <span class="check-icon">○</span>
+                    <span>사설 1-1. 주식의 탄생</span>
+                </div>
+                <div class="toc-item" data-chapter="essay-1-2">
+                    <span class="check-icon">○</span>
+                    <span>사설 1-2. 종이에서 화면까지</span>
+                </div>
+                <div class="toc-item" data-chapter="essay-2-1">
+                    <span class="check-icon">○</span>
+                    <span>사설 2-1. 평정심 찾기</span>
+                </div>
+                <div class="toc-item" data-chapter="essay-2-2">
+                    <span class="check-icon">○</span>
+                    <span>사설 2-2. 투자 vs 투기</span>
+                </div>
+                <div class="toc-item" data-chapter="essay-2-3">
+                    <span class="check-icon">○</span>
+                    <span>사설 2-3. 복리의 마법</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 오른쪽 콘텐츠 -->
+        <div class="content">
+            <div class="content-header">
+                <span class="badge">1장 1절</span>
+                <h2>💡 내 돈의 진짜 이름, '총 자산(순자산)'</h2>
+            </div>
+
+            <div class="content-body">
+                <h3>💡 내가 가진 모든 것을 합쳐봐요!</h3>
+                <p>여러분, 혹시 "나 지금 얼마 있어?"라는 질문을 받으면 어떻게 대답하나요? 아마 지갑 속 현금만 떠올릴 거예요. 하지만 진짜 내 재산은 그것보다 훨씬 많답니다!</p>
+                
+                <p><strong>총 자산(순자산)</strong>이란, 쉽게 말해 <strong>"내가 가진 모든 것을 돈으로 바꾸면 얼마일까?"</strong>에 대한 대답이에요.</p>
+
+                <h3>🎒 가방 속 보물들을 세어볼까요?</h3>
+                <p>여러분의 가방 안에 이런 것들이 있다고 상상해 봐요.</p>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>보물</th>
+                            <th>예시</th>
+                            <th>모의투자에서는?</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>주머니 속 동전과 지폐</td>
+                            <td>1,000원</td>
+                            <td><strong>현금 (지갑)</strong></td>
+                        </tr>
+                        <tr>
+                            <td>은행 통장에 넣어둔 돈</td>
+                            <td>5,000원</td>
+                            <td><strong>예금 (저축)</strong></td>
+                        </tr>
+                        <tr>
+                            <td>내가 산 회사의 주식</td>
+                            <td>10,000원어치</td>
+                            <td><strong>주식 평가액</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <p>이 세 가지를 <strong>모두 더하면</strong> 바로 나의 <strong>총 자산</strong>이 되는 거예요!</p>
+                
+                <blockquote>
+                    1,000원 + 5,000원 + 10,000원 = <strong>16,000원 (총 자산)</strong>
+                </blockquote>
+
+                <h3>✨ 왜 '총 자산'을 알아야 할까요?</h3>
+                <p>지갑에 현금이 별로 없어도 걱정하지 마세요. 은행에 저축해둔 돈, 그리고 내가 투자한 주식까지 모두 합치면 생각보다 많을 수 있거든요. 반대로, 현금은 많은데 주식이 떨어져서 총 자산이 줄어들 수도 있어요.</p>
+
+                <p>그래서 <strong>진짜 부자인지 아닌지</strong>는 지갑만 보면 안 되고, <strong>총 자산</strong>을 봐야 알 수 있답니다!</p>
+
+                <blockquote>
+                    <strong>📌 기억해요!</strong><br>
+                    <strong>총 자산 = 현금 + 예금 + 주식 평가액</strong><br>
+                    내 재산의 '진짜 점수'를 알려주는 숫자예요!
+                </blockquote>
+
+                <button class="complete-btn" onclick="toggleComplete()">
+                    ✓ 학습 완료 표시하기
+                </button>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="nav-btn prev" disabled>
+                    ← 이전
+                </button>
+                <button class="nav-btn next" onclick="nextChapter()">
+                    다음 →
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 간단한 인터랙션 데모
+        const tocItems = document.querySelectorAll('.toc-item');
+        const completeBtn = document.querySelector('.complete-btn');
+        let completedChapters = new Set();
+
+        tocItems.forEach(item => {
+            item.addEventListener('click', () => {
+                tocItems.forEach(i => i.classList.remove('active'));
+                item.classList.add('active');
+                
+                // 실제로는 여기서 해당 챕터 내용을 로드
+                console.log('챕터 변경:', item.dataset.chapter);
+            });
+        });
+
+        function toggleComplete() {
+            const activeItem = document.querySelector('.toc-item.active');
+            const chapter = activeItem.dataset.chapter;
+            
+            if (completedChapters.has(chapter)) {
+                completedChapters.delete(chapter);
+                activeItem.classList.remove('completed');
+                activeItem.querySelector('.check-icon').textContent = '○';
+                completeBtn.textContent = '✓ 학습 완료 표시하기';
+                completeBtn.classList.remove('completed');
+            } else {
+                completedChapters.add(chapter);
+                activeItem.classList.add('completed');
+                activeItem.querySelector('.check-icon').textContent = '✓';
+                completeBtn.textContent = '✓ 완료됨';
+                completeBtn.classList.add('completed');
+            }
+            
+            updateProgress();
+        }
+
+        function updateProgress() {
+            const total = tocItems.length;
+            const completed = completedChapters.size;
+            const percentage = Math.round((completed / total) * 100);
+            
+            document.getElementById('progress-text').textContent = `${completed}/${total} (${percentage}%)`;
+            document.getElementById('progress-fill').style.width = `${percentage}%`;
+        }
+
+        function nextChapter() {
+            const activeItem = document.querySelector('.toc-item.active');
+            const nextItem = activeItem.nextElementSibling;
+            
+            if (nextItem && nextItem.classList.contains('toc-item')) {
+                activeItem.classList.remove('active');
+                nextItem.classList.add('active');
+                nextItem.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            } else {
+                // 다음 섹션의 첫 번째 아이템으로
+                const nextSection = activeItem.closest('.toc-section').nextElementSibling;
+                if (nextSection) {
+                    const firstItem = nextSection.querySelector('.toc-item');
+                    if (firstItem) {
+                        activeItem.classList.remove('active');
+                        firstItem.classList.add('active');
+                        firstItem.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+</html>

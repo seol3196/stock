@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { BarChart3, TrendingUp, Landmark, LogOut, Menu, X } from "lucide-react";
+import { BarChart3, TrendingUp, Landmark, LogOut, Menu, X, BookOpen } from "lucide-react";
 import { ReactNode, useState, useEffect } from "react";
 
 export default function StudentLayout({ children }: { children: ReactNode }) {
@@ -101,6 +101,7 @@ export default function StudentLayout({ children }: { children: ReactNode }) {
                     <NavLink href="/student" icon={<BarChart3 size={24} />} label="내 포트폴리오" onClick={() => setMobileMenuOpen(false)} />
                     <NavLink href="/student/trade" icon={<TrendingUp size={24} />} label="주식 거래소" onClick={() => setMobileMenuOpen(false)} />
                     <NavLink href="/student/bank" icon={<Landmark size={24} />} label="은행 & 저축" onClick={() => setMobileMenuOpen(false)} />
+                    <NavLink href="/student/learn" icon={<BookOpen size={24} />} label="주식공부하기" onClick={() => setMobileMenuOpen(false)} />
                 </nav>
 
                 <div style={{ position: "absolute", bottom: "2rem", width: "100%", padding: "0 1rem" }}>
