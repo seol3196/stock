@@ -7,15 +7,18 @@ import { ReactNode, useState, useEffect } from "react";
 export default function StudentLayout({ children }: { children: ReactNode }) {
     const router = useRouter();
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-    const [username, setUsername] = useState<string>("");
+    const [displayName, setDisplayName] = useState<string>("");
 
     // Fetch user session on mount
     useEffect(() => {
         fetch('/api/session')
             .then(res => res.json())
             .then(data => {
-                if (data.username) {
-                    setUsername(data.username);
+                // Prefer name over username for display
+                if (data.name) {
+                    setDisplayName(data.name);
+                } else if (data.username) {
+                    setDisplayName(data.username);
                 }
             })
             .catch(() => { });
@@ -79,7 +82,7 @@ export default function StudentLayout({ children }: { children: ReactNode }) {
                     <p style={{ fontSize: "1rem", color: "var(--color-text-muted)", marginTop: "0.25rem" }}>
                         Classroom Stock Market
                     </p>
-                    {username && (
+                    {displayName && (
                         <p style={{
                             fontSize: "0.875rem",
                             fontWeight: "600",
@@ -89,7 +92,7 @@ export default function StudentLayout({ children }: { children: ReactNode }) {
                             background: "#eff6ff",
                             borderRadius: "var(--radius-sm)"
                         }}>
-                            {username}님 안녕하세요
+                            {displayName}님 안녕하세요
                         </p>
                     )}
                 </div>

@@ -17,7 +17,7 @@ export default async function TeacherDashboard() {
     // 이 교사가 상장한 주식 수만 카운트
     const stockCount = db.prepare('SELECT COUNT(*) as count FROM stocks WHERE teacher_id = ?').get(teacherId) as { count: number };
 
-    // 이 교사의 학생들의 총 자산만 계산
+    // 이 교사의 학생들의 총 자산만 계산 (현금 + 예금)
     const totalMoney = db.prepare(`
     SELECT 
       SUM(cash) as total_cash,
@@ -26,7 +26,16 @@ export default async function TeacherDashboard() {
     WHERE teacher_id = ?
   `).get(teacherId) as { total_cash: number | null; total_savings: number | null };
 
-    const totalAssets = (totalMoney.total_cash || 0) + (totalMoney.total_savings || 0);
+    // 이 교사의 학생들이 보유한 주식 평가액 계산
+    const totalStockValue = db.prepare(`
+    SELECT COALESCE(SUM(so.quantity * s.current_price), 0) as total_stock_value
+    FROM stock_ownership so
+    JOIN stocks s ON so.stock_id = s.id
+    JOIN students st ON so.student_id = st.id
+    WHERE st.teacher_id = ?
+  `).get(teacherId) as { total_stock_value: number };
+
+    const totalAssets = (totalMoney.total_cash || 0) + (totalMoney.total_savings || 0) + (totalStockValue.total_stock_value || 0);
 
     return (
         <div>

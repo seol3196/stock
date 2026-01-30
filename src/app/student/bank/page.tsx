@@ -315,7 +315,7 @@ export default function BankPage() {
                                         <button
                                             key={amt}
                                             type="button"
-                                            onClick={() => setAmount(String(amt))}
+                                            onClick={() => setAmount(String((Number(amount) || 0) + amt))}
                                             style={{
                                                 padding: '0.5rem',
                                                 borderRadius: '10px',

@@ -1,13 +1,14 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { Home, Users, TrendingUp, LogOut, Menu, X } from "lucide-react";
+import { Home, Users, TrendingUp, LogOut, Menu, X, Trophy } from "lucide-react";
 import { ReactNode, useState, useEffect } from "react";
 
 export default function TeacherLayout({ children }: { children: ReactNode }) {
     const router = useRouter();
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [username, setUsername] = useState<string>("");
+    const [isAdmin, setIsAdmin] = useState<boolean>(false);
 
     // Fetch user session on mount
     useEffect(() => {
@@ -16,6 +17,10 @@ export default function TeacherLayout({ children }: { children: ReactNode }) {
             .then(data => {
                 if (data.username) {
                     setUsername(data.username);
+                    // Check if user is admin
+                    if (data.username === "admin") {
+                        setIsAdmin(true);
+                    }
                 }
             })
             .catch(() => { });
@@ -80,17 +85,48 @@ export default function TeacherLayout({ children }: { children: ReactNode }) {
                         Classroom Stock Market
                     </p>
                     {username && (
-                        <p style={{
-                            fontSize: "0.875rem",
-                            fontWeight: "600",
-                            color: "#1e40af",
-                            marginTop: "0.75rem",
-                            padding: "0.5rem",
-                            background: "#eff6ff",
-                            borderRadius: "var(--radius-sm)"
-                        }}>
-                            {username}님 안녕하세요
-                        </p>
+                        <>
+                            <p style={{
+                                fontSize: "0.875rem",
+                                fontWeight: "600",
+                                color: "#1e40af",
+                                marginTop: "0.75rem",
+                                padding: "0.5rem",
+                                background: "#eff6ff",
+                                borderRadius: "var(--radius-sm)"
+                            }}>
+                                {username}님 안녕하세요
+                            </p>
+                            {isAdmin && (
+                                <button
+                                    onClick={() => router.push("/secret-admin-2026")}
+                                    style={{
+                                        width: "100%",
+                                        marginTop: "0.5rem",
+                                        padding: "0.5rem",
+                                        background: "linear-gradient(135deg, #dc2626, #991b1b)",
+                                        border: "none",
+                                        borderRadius: "var(--radius-sm)",
+                                        color: "white",
+                                        fontSize: "0.8rem",
+                                        fontWeight: "600",
+                                        cursor: "pointer",
+                                        transition: "var(--transition)",
+                                        boxShadow: "0 2px 4px rgba(220, 38, 38, 0.2)"
+                                    }}
+                                    onMouseOver={(e) => {
+                                        e.currentTarget.style.transform = "translateY(-1px)";
+                                        e.currentTarget.style.boxShadow = "0 4px 8px rgba(220, 38, 38, 0.3)";
+                                    }}
+                                    onMouseOut={(e) => {
+                                        e.currentTarget.style.transform = "translateY(0)";
+                                        e.currentTarget.style.boxShadow = "0 2px 4px rgba(220, 38, 38, 0.2)";
+                                    }}
+                                >
+                                    🔐 관리자 페이지
+                                </button>
+                            )}
+                        </>
                     )}
                 </div>
 
@@ -98,6 +134,7 @@ export default function TeacherLayout({ children }: { children: ReactNode }) {
                     <NavLink href="/teacher" icon={<Home size={20} />} label="대시보드" onClick={() => setMobileMenuOpen(false)} />
                     <NavLink href="/teacher/students" icon={<Users size={20} />} label="학생 관리" onClick={() => setMobileMenuOpen(false)} />
                     <NavLink href="/teacher/market" icon={<TrendingUp size={20} />} label="시장 & 은행" onClick={() => setMobileMenuOpen(false)} />
+                    <NavLink href="/teacher/ranking" icon={<Trophy size={20} />} label="학생 랭킹" onClick={() => setMobileMenuOpen(false)} />
                 </nav>
 
                 <div style={{ position: "absolute", bottom: "2rem", width: "100%", padding: "0 1rem" }}>

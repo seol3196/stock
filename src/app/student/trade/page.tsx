@@ -91,48 +91,73 @@ export default function TradePage() {
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1rem' }} className="stock-grid">
                 {loading ? (
-                    <div className="col-span-3 text-center py-10 text-xl text-white">시장 데이터를 불러오는 중...</div>
+                    <div style={{ gridColumn: 'span 2', textAlign: 'center', padding: '3rem 0', fontSize: '1.25rem', color: 'white' }}>시장 데이터를 불러오는 중...</div>
                 ) : stocks.map((stock) => (
-                    <div key={stock.id} className="glass-panel p-6 border-l-4 border-l-secondary/50 flex flex-col justify-between bg-slate-800/40 hover:bg-slate-800/60 transition-all border-slate-700">
-                        <div>
-                            <div className="flex justify-between items-start mb-4">
-                                <div>
-                                    <h3 className="text-2xl font-bold text-white mb-2">{stock.name}</h3>
-                                    {/* Code removed */}
-                                </div>
-                                <div className="text-right">
-                                    <div className="font-mono font-black text-white" style={{ fontSize: '2rem' }}>₩{stock.currentPrice.toLocaleString()}</div>
-                                </div>
-                            </div>
+                    <div key={stock.id} style={{
+                        background: 'rgba(255,255,255,0.95)',
+                        borderRadius: '16px',
+                        padding: '1.5rem',
+                        border: '1px solid #e2e8f0',
+                        borderLeft: '4px solid #6366f1'
+                    }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
+                            <h3 style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#1e293b' }}>{stock.name}</h3>
+                            <div style={{ fontSize: '1.75rem', fontWeight: '800', fontFamily: 'monospace', color: '#0f172a' }}>₩{stock.currentPrice.toLocaleString()}</div>
                         </div>
 
-                        <div className="mt-4 pt-4 border-t border-white/10">
-                            <div className="flex justify-between items-center text-slate-200 font-medium mb-4">
-                                <span className="text-lg">보유 수량:</span>
-                                <span className="text-white font-mono font-bold" style={{ fontSize: '1.5rem' }}>{portfolio[stock.id] || 0} 주</span>
-                            </div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', paddingTop: '0.75rem', borderTop: '1px solid #e2e8f0' }}>
+                            <span style={{ fontSize: '0.9rem', color: '#64748b' }}>보유 수량:</span>
+                            <span style={{ fontSize: '1.25rem', fontWeight: 'bold', fontFamily: 'monospace', color: '#1e293b' }}>{portfolio[stock.id] || 0} 주</span>
+                        </div>
 
-                            <div className="grid grid-cols-2 gap-3">
-                                <button
-                                    onClick={() => openTradeModal(stock, "BUY")}
-                                    className="btn btn-primary w-full py-3 text-lg font-bold shadow-md hover:scale-[1.02] transition-transform"
-                                >
-                                    매수
-                                </button>
-                                <button
-                                    onClick={() => openTradeModal(stock, "SELL")}
-                                    className="btn btn-outline w-full py-3 text-lg font-bold disabled:opacity-30 disabled:hover:scale-100 hover:scale-[1.02] transition-transform bg-transparent border-slate-500 text-white hover:bg-white/10"
-                                    disabled={!portfolio[stock.id]}
-                                >
-                                    매도
-                                </button>
-                            </div>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+                            <button
+                                onClick={() => openTradeModal(stock, "BUY")}
+                                style={{
+                                    padding: '0.75rem',
+                                    borderRadius: '10px',
+                                    background: '#2563eb',
+                                    border: 'none',
+                                    color: 'white',
+                                    fontSize: '1rem',
+                                    fontWeight: 'bold',
+                                    cursor: 'pointer'
+                                }}
+                            >
+                                매수
+                            </button>
+                            <button
+                                onClick={() => openTradeModal(stock, "SELL")}
+                                disabled={!portfolio[stock.id]}
+                                style={{
+                                    padding: '0.75rem',
+                                    borderRadius: '10px',
+                                    background: 'white',
+                                    border: '2px solid #64748b',
+                                    color: '#1e293b',
+                                    fontSize: '1rem',
+                                    fontWeight: 'bold',
+                                    cursor: portfolio[stock.id] ? 'pointer' : 'not-allowed',
+                                    opacity: portfolio[stock.id] ? 1 : 0.4
+                                }}
+                            >
+                                매도
+                            </button>
                         </div>
                     </div>
                 ))}
             </div>
+
+            {/* Mobile CSS for stock grid */}
+            <style jsx>{`
+                @media (max-width: 768px) {
+                    .stock-grid {
+                        grid-template-columns: 1fr !important;
+                    }
+                }
+            `}</style>
 
             {/* Trade Modal - Light Theme Verified */}
             {selectedStock && (
