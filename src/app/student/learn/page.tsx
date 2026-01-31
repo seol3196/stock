@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, ChevronLeft, ChevronRight, CheckCircle, Circle, BookOpen, HelpCircle, RotateCcw, Lock } from "lucide-react";
+import { ChevronLeft, ChevronRight, CheckCircle, Circle, BookOpen, HelpCircle, RotateCcw, Lock, Menu, X } from "lucide-react";
 import { sections, getAllChapters, getChapterById, getAdjacentChapters } from "./content";
 import { getQuizByChapterId, checkTextAnswer, isQuizPassed, Question } from "./quizzes";
 
@@ -11,11 +11,30 @@ export default function LearnPage() {
     const [currentChapterId, setCurrentChapterId] = useState("1-1");
     const [completedChapters, setCompletedChapters] = useState<Set<string>>(new Set());
     const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set(["main", "essay"]));
+    const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [isMobile, setIsMobile] = useState(false);
 
     // 퀴즈 상태
     const [userAnswers, setUserAnswers] = useState<Record<string, Record<number, string>>>({});
     const [showResults, setShowResults] = useState<Record<string, boolean>>({});
     const [textInputs, setTextInputs] = useState<Record<number, string>>({});
+
+    // 화면 크기 감지
+    useEffect(() => {
+        const checkMobile = () => {
+            setIsMobile(window.innerWidth < 1024);
+        };
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
+
+    // 모바일에서 챕터 변경 시 사이드바 닫기
+    useEffect(() => {
+        if (isMobile) {
+            setSidebarOpen(false);
+        }
+    }, [currentChapterId, isMobile]);
 
     // Load completed chapters from localStorage
     useEffect(() => {
@@ -210,8 +229,6 @@ export default function LearnPage() {
         return `<div style="line-height: 1.9; color: #334155; font-size: 1.1rem;"><p style="margin: 1.25rem 0; font-size: 1.1rem;">${html}</p></div>`;
     };
 
-
-
     // 설명 박스 스타일
     const explanationStyle = {
         marginTop: '0.75rem',
@@ -235,22 +252,22 @@ export default function LearnPage() {
                 marginTop: '2rem',
                 border: '2px solid #f59e0b'
             }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.75rem' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                         <HelpCircle size={24} color="#d97706" />
                         <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#92400e' }}>📝 이해도 체크</h3>
                     </div>
                     {hasSubmitted && (
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
                             <span style={{
                                 padding: '0.5rem 1rem',
                                 background: quizPassed ? '#22c55e' : '#ef4444',
                                 color: 'white',
                                 borderRadius: '20px',
                                 fontWeight: 'bold',
-                                fontSize: '0.95rem'
+                                fontSize: '0.9rem'
                             }}>
-                                {correctCount}/{totalCount} {quizPassed ? '✓ 통과!' : '재도전 필요'}
+                                {correctCount}/{totalCount} {quizPassed ? '✓' : '재도전'}
                             </span>
                             <button
                                 onClick={handleRetry}
@@ -258,17 +275,17 @@ export default function LearnPage() {
                                     display: 'flex',
                                     alignItems: 'center',
                                     gap: '0.375rem',
-                                    padding: '0.5rem 1rem',
+                                    padding: '0.5rem 0.75rem',
                                     background: '#f1f5f9',
                                     border: 'none',
                                     borderRadius: '8px',
                                     cursor: 'pointer',
                                     fontWeight: 'bold',
                                     color: '#475569',
-                                    fontSize: '0.9rem'
+                                    fontSize: '0.85rem'
                                 }}
                             >
-                                <RotateCcw size={16} />
+                                <RotateCcw size={14} />
                                 다시 풀기
                             </button>
                         </div>
@@ -403,7 +420,7 @@ export default function LearnPage() {
                             {q.type === 'text' && (
                                 <div style={{ marginLeft: '2.25rem' }}>
                                     {!hasSubmitted ? (
-                                        <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                        <div style={{ display: 'flex', gap: '0.5rem', flexDirection: isMobile ? 'column' : 'row' }}>
                                             <input
                                                 type="text"
                                                 value={textInputs[q.id] || chapterAnswers[q.id] || ''}
@@ -438,7 +455,7 @@ export default function LearnPage() {
                                         </div>
                                     ) : (
                                         <>
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
                                                 <span style={{
                                                     padding: '0.75rem 1rem',
                                                     background: isCorrect(q) ? '#dcfce7' : '#fee2e2',
@@ -503,8 +520,64 @@ export default function LearnPage() {
             margin: '-3rem',
             padding: '1.5rem',
             minHeight: 'calc(100vh - 0px)',
-            background: '#f1f5f9'
+            background: '#f1f5f9',
+            position: 'relative'
         }}>
+            {/* 모바일 하단 플로팅 버튼 */}
+            {isMobile && (
+                <button
+                    onClick={() => setSidebarOpen(true)}
+                    style={{
+                        position: 'fixed',
+                        bottom: '2rem',
+                        right: '1.5rem',
+                        zIndex: 100,
+                        width: '56px',
+                        height: '56px',
+                        borderRadius: '50%',
+                        background: 'linear-gradient(135deg, #667eea, #764ba2)',
+                        border: 'none',
+                        color: 'white',
+                        cursor: 'pointer',
+                        boxShadow: '0 4px 16px rgba(102, 126, 234, 0.5)',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '2px',
+                        transition: 'transform 0.2s, box-shadow 0.2s'
+                    }}
+                    onMouseOver={(e) => {
+                        e.currentTarget.style.transform = 'scale(1.1)';
+                        e.currentTarget.style.boxShadow = '0 6px 20px rgba(102, 126, 234, 0.6)';
+                    }}
+                    onMouseOut={(e) => {
+                        e.currentTarget.style.transform = 'scale(1)';
+                        e.currentTarget.style.boxShadow = '0 4px 16px rgba(102, 126, 234, 0.5)';
+                    }}
+                >
+                    <BookOpen size={22} />
+                    <span style={{ fontSize: '0.65rem', fontWeight: '600' }}>목차</span>
+                </button>
+            )}
+
+            {/* 오버레이 배경 (모바일) */}
+            {isMobile && sidebarOpen && (
+                <div
+                    onClick={() => setSidebarOpen(false)}
+                    style={{
+                        position: 'fixed',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        background: 'rgba(0, 0, 0, 0.5)',
+                        zIndex: 200,
+                        animation: 'fadeIn 0.2s ease'
+                    }}
+                />
+            )}
+
             {/* 왼쪽 목차 사이드바 */}
             <aside style={{
                 width: '340px',
@@ -514,9 +587,42 @@ export default function LearnPage() {
                 padding: '1.5rem',
                 boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
                 height: 'fit-content',
-                position: 'sticky',
-                top: '1.5rem'
+                position: isMobile ? 'fixed' : 'sticky',
+                top: isMobile ? '50%' : '1.5rem',
+                left: isMobile ? '50%' : 'auto',
+                zIndex: isMobile ? 201 : 'auto',
+                maxHeight: isMobile ? '80vh' : 'auto',
+                overflowY: 'auto',
+                transform: isMobile
+                    ? (sidebarOpen ? 'translate(-50%, -50%) scale(1)' : 'translate(-50%, -50%) scale(0.9)')
+                    : 'translateX(0)',
+                opacity: isMobile ? (sidebarOpen ? 1 : 0) : 1,
+                pointerEvents: isMobile && !sidebarOpen ? 'none' : 'auto',
+                transition: 'transform 0.3s ease, opacity 0.3s ease',
+                display: 'block'
             }}>
+                {/* 모바일 닫기 버튼 */}
+                {isMobile && (
+                    <button
+                        onClick={() => setSidebarOpen(false)}
+                        style={{
+                            position: 'absolute',
+                            top: '1rem',
+                            right: '1rem',
+                            padding: '0.5rem',
+                            background: '#f1f5f9',
+                            border: 'none',
+                            borderRadius: '8px',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                        }}
+                    >
+                        <X size={20} color="#475569" />
+                    </button>
+                )}
+
                 {/* 헤더 */}
                 <div style={{ marginBottom: '1.25rem', paddingBottom: '1rem', borderBottom: '2px solid #e2e8f0' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
@@ -549,7 +655,7 @@ export default function LearnPage() {
                 </div>
 
                 {/* 목차 */}
-                <div style={{ maxHeight: '450px', overflowY: 'auto' }}>
+                <div style={{ maxHeight: isMobile ? '50vh' : '450px', overflowY: 'auto' }}>
                     {sections.map(section => (
                         <div key={section.id} style={{ marginBottom: '0.875rem' }}>
                             <button
@@ -584,7 +690,10 @@ export default function LearnPage() {
                                     {section.chapters.map(chapter => (
                                         <button
                                             key={chapter.id}
-                                            onClick={() => setCurrentChapterId(chapter.id)}
+                                            onClick={() => {
+                                                setCurrentChapterId(chapter.id);
+                                                setSidebarOpen(false);
+                                            }}
                                             style={{
                                                 width: '100%',
                                                 padding: '0.625rem 0.75rem',
@@ -620,30 +729,6 @@ export default function LearnPage() {
                         </div>
                     ))}
                 </div>
-
-                {/* 돌아가기 버튼 */}
-                <button
-                    onClick={() => router.push('/student')}
-                    style={{
-                        width: '100%',
-                        padding: '1rem',
-                        marginTop: '1rem',
-                        background: 'linear-gradient(135deg, #667eea, #764ba2)',
-                        border: 'none',
-                        borderRadius: '12px',
-                        color: 'white',
-                        fontWeight: 'bold',
-                        fontSize: '1rem',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: '0.5rem'
-                    }}
-                >
-                    <ArrowLeft size={18} />
-                    다시 주식투자하러 가기
-                </button>
             </aside>
 
             {/* 오른쪽 콘텐츠 영역 */}
@@ -651,8 +736,9 @@ export default function LearnPage() {
                 flex: 1,
                 background: 'white',
                 borderRadius: '16px',
-                padding: '2.5rem',
-                boxShadow: '0 2px 12px rgba(0,0,0,0.08)'
+                padding: isMobile ? '1.5rem' : '1.5rem 1.5rem 1.5rem 2.5rem',
+                boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
+                marginLeft: isMobile ? '0' : 'auto'
             }}>
                 {currentChapter && (
                     <>
@@ -670,7 +756,7 @@ export default function LearnPage() {
                             }}>
                                 {currentChapter.badge}
                             </span>
-                            <h1 style={{ fontSize: '2rem', fontWeight: '800', color: '#1e293b', lineHeight: '1.4' }}>
+                            <h1 style={{ fontSize: isMobile ? '1.5rem' : '2rem', fontWeight: '800', color: '#1e293b', lineHeight: '1.4' }}>
                                 {currentChapter.title}
                             </h1>
                         </div>
@@ -711,7 +797,7 @@ export default function LearnPage() {
                             {completedChapters.has(currentChapterId) ? (
                                 <>
                                     <CheckCircle size={22} />
-                                    학습 완료됨 (클릭하여 취소)
+                                    학습 완료됨
                                 </>
                             ) : canComplete ? (
                                 <>
@@ -732,7 +818,8 @@ export default function LearnPage() {
                             justifyContent: 'space-between',
                             marginTop: '2rem',
                             paddingTop: '1.5rem',
-                            borderTop: '2px solid #e2e8f0'
+                            borderTop: '2px solid #e2e8f0',
+                            gap: '1rem'
                         }}>
                             <button
                                 onClick={() => prev && setCurrentChapterId(prev.id)}
@@ -748,7 +835,9 @@ export default function LearnPage() {
                                     display: 'flex',
                                     alignItems: 'center',
                                     gap: '0.5rem',
-                                    fontSize: '1rem'
+                                    fontSize: '1rem',
+                                    flex: 1,
+                                    justifyContent: 'center'
                                 }}
                             >
                                 <ChevronLeft size={20} />
@@ -768,7 +857,9 @@ export default function LearnPage() {
                                     display: 'flex',
                                     alignItems: 'center',
                                     gap: '0.5rem',
-                                    fontSize: '1rem'
+                                    fontSize: '1rem',
+                                    flex: 1,
+                                    justifyContent: 'center'
                                 }}
                             >
                                 다음
@@ -778,6 +869,13 @@ export default function LearnPage() {
                     </>
                 )}
             </main>
+
+            <style>{`
+                @keyframes fadeIn {
+                    from { opacity: 0; }
+                    to { opacity: 1; }
+                }
+            `}</style>
         </div>
     );
 }
