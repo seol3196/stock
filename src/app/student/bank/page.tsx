@@ -145,7 +145,7 @@ export default function BankPage() {
                             <ArrowRightLeft size={32} color="white" />
                         </div>
                         <div>
-                            <h2 style={{ fontSize: '1.75rem', fontWeight: 'bold', color: 'white', marginBottom: '0.5rem' }}>저축하기 (입금)</h2>
+                            <h2 style={{ fontSize: '1.75rem', fontWeight: 'bold', color: 'white', marginBottom: '0.5rem' }}>예금통장에 저축하기 (입금)</h2>
                             <p style={{ color: '#dbeafe', fontSize: '1.125rem', fontWeight: '500' }}>현금을 통장에 넣어두세요</p>
                         </div>
                     </div>
@@ -366,7 +366,7 @@ export default function BankPage() {
                                     if (!processing) e.currentTarget.style.transform = 'translateY(0)';
                                 }}
                             >
-                                {processing ? "처리 중..." : (mode === "DEPOSIT" ? "저축하기" : "출금하기")}
+                                {processing ? "처리 중..." : (mode === "DEPOSIT" ? "예금통장에 저축하기 (입금)" : "출금하기")}
                             </button>
                         </form>
                     </div>
