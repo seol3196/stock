@@ -15,6 +15,9 @@ export default function MarketManagementPage() {
         currentPrice: 1000,
     });
 
+    const [cashAmount, setCashAmount] = useState<number | "">("");
+    const [cashProcessing, setCashProcessing] = useState(false);
+
     useEffect(() => {
         fetchData();
     }, []);
@@ -206,10 +209,9 @@ export default function MarketManagementPage() {
                             else alert(json.message || "오류 발생");
                         }}
                         style={{
-
                             border: 'none',
-                            color: '#059669', // Emerald 600
-                            background: '#ecfdf5', // Emerald 50
+                            color: '#059669',
+                            background: '#ecfdf5',
                             padding: '0.5rem 1rem',
                             borderRadius: '999px',
                             textDecoration: 'none',
@@ -222,6 +224,111 @@ export default function MarketManagementPage() {
                         }}
                     >
                         💰 모든 학생에게 이자 즉시 지급하기
+                    </button>
+                </div>
+            </div>
+
+            {/* Cash Distribution */}
+            <div style={{
+                background: 'rgba(255, 255, 255, 0.8)',
+                backdropFilter: 'blur(12px)',
+                border: '1px solid rgba(0, 0, 0, 0.05)',
+                borderRadius: '24px',
+                padding: '2rem',
+                marginBottom: '3rem',
+                boxShadow: '0 4px 20px rgba(0, 0, 0, 0.05)'
+            }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem' }}>
+                    <div style={{
+                        background: '#fefce8',
+                        padding: '0.75rem',
+                        borderRadius: '12px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                    }}>
+                        <span style={{ fontSize: '1.5rem' }}>💵</span>
+                    </div>
+                    <div>
+                        <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '0.25rem', color: '#0f172a' }}>현금 즉시 지급</h2>
+                        <p style={{ color: '#64748b', fontSize: '0.9rem', fontWeight: '500' }}>내 학생들에게 현금을 즉시 지급합니다.</p>
+                    </div>
+                </div>
+
+                <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '1.5rem',
+                    padding: '1.5rem',
+                    borderRadius: '16px',
+                    border: '1px solid #e2e8f0'
+                }}>
+                    <div style={{ flex: 1 }}>
+                        <label style={{ display: 'block', fontSize: '0.875rem', color: '#64748b', marginBottom: '0.5rem', fontWeight: '600' }}>1인당 지급 금액</label>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                            <span style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#64748b' }}>₩</span>
+                            <input
+                                type="number"
+                                min="1"
+                                placeholder="0"
+                                value={cashAmount}
+                                onChange={(e) => setCashAmount(e.target.value === "" ? "" : Number(e.target.value))}
+                                style={{
+                                    background: 'transparent',
+                                    fontSize: '2.5rem',
+                                    fontWeight: '800',
+                                    color: '#0f172a',
+                                    width: '200px',
+                                    border: 'none',
+                                    borderBottom: '3px solid #cbd5e1',
+                                    textAlign: 'right',
+                                    outline: 'none',
+                                    fontFamily: 'monospace'
+                                }}
+                            />
+                        </div>
+                    </div>
+                    <button
+                        disabled={cashProcessing || !cashAmount}
+                        onClick={async () => {
+                            if (!cashAmount || Number(cashAmount) <= 0) return;
+                            if (!confirm(`학생 1인당 ₩${Number(cashAmount).toLocaleString()}을 지급하시겠습니까?`)) return;
+                            setCashProcessing(true);
+                            try {
+                                const res = await fetch("/api/teacher/students/cash", {
+                                    method: "POST",
+                                    headers: { "Content-Type": "application/json" },
+                                    body: JSON.stringify({ amount: cashAmount }),
+                                });
+                                const json = await res.json();
+                                if (json.success) {
+                                    alert(`${json.count}명의 학생에게 ₩${Number(json.amount).toLocaleString()}씩 지급되었습니다.`);
+                                    setCashAmount("");
+                                } else {
+                                    alert(json.error || json.message || "오류 발생");
+                                }
+                            } finally {
+                                setCashProcessing(false);
+                            }
+                        }}
+                        style={{
+                            background: cashProcessing || !cashAmount ? '#e2e8f0' : '#0f172a',
+                            color: cashProcessing || !cashAmount ? '#94a3b8' : 'white',
+                            padding: '1rem 1.75rem',
+                            borderRadius: '12px',
+                            border: 'none',
+                            fontSize: '1rem',
+                            fontWeight: '600',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.5rem',
+                            cursor: cashProcessing || !cashAmount ? 'not-allowed' : 'pointer',
+                            transition: 'all 0.2s',
+                            boxShadow: cashProcessing || !cashAmount ? 'none' : '0 4px 6px rgba(15, 23, 42, 0.15)',
+                            whiteSpace: 'nowrap'
+                        }}
+                    >
+                        💵 {cashProcessing ? "지급 중..." : "즉시 지급"}
                     </button>
                 </div>
             </div>

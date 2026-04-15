@@ -10,7 +10,7 @@ export async function GET() {
 
     const stocks = db.prepare(`
     SELECT * FROM stocks
-    WHERE teacher_id = ?
+    WHERE teacher_id = ? AND is_active = 1
     ORDER BY name ASC
   `).all(session.id as string);
 
@@ -78,15 +78,32 @@ export async function DELETE(request: Request) {
     try {
         const { id } = await request.json();
 
-        // Delete stock ownership records first (foreign key constraint)
-        db.prepare('DELETE FROM stock_ownership WHERE stock_id = ?').run(id);
+        const delist = db.transaction(() => {
+            // 보유 학생 목록 조회
+            const holdings = db.prepare(
+                'SELECT student_id, quantity FROM stock_ownership WHERE stock_id = ?'
+            ).all(id) as { student_id: string; quantity: number }[];
 
-        // Delete the stock
-        db.prepare('DELETE FROM stocks WHERE id = ? AND teacher_id = ?').run(id, session.id as string);
+            // 각 학생에게 상장폐지 손실 거래내역 기록 (price=0)
+            const insertTx = db.prepare(
+                'INSERT INTO transactions (id, student_id, stock_id, type, price, quantity) VALUES (?, ?, ?, ?, 0, ?)'
+            );
+            for (const holding of holdings) {
+                insertTx.run(generateId(), holding.student_id, id, '상장폐지', holding.quantity);
+            }
+
+            // 보유 기록 삭제
+            db.prepare('DELETE FROM stock_ownership WHERE stock_id = ?').run(id);
+
+            // 소프트 삭제 (거래내역 FK 무결성 유지)
+            db.prepare('UPDATE stocks SET is_active = 0 WHERE id = ? AND teacher_id = ?').run(id, session.id as string);
+        });
+
+        delist();
 
         return NextResponse.json({ success: true });
     } catch (e) {
         console.error(e);
-        return NextResponse.json({ error: "Failed to delete stock" }, { status: 500 });
+        return NextResponse.json({ error: "Failed to delist stock" }, { status: 500 });
     }
 }

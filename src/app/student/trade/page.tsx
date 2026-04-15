@@ -15,6 +15,8 @@ export default function TradePage() {
     const [quantity, setQuantity] = useState(1);
     const [processing, setProcessing] = useState(false);
 
+    const [expandedStockId, setExpandedStockId] = useState<string | null>(null);
+
     useEffect(() => {
         fetchData();
     }, []);
@@ -81,6 +83,10 @@ export default function TradePage() {
         setQuantity(1);
     };
 
+    const toggleExpand = (stockId: string) => {
+        setExpandedStockId(prev => prev === stockId ? null : stockId);
+    };
+
     return (
         <div>
             <div className="flex justify-between items-center mb-8">
@@ -91,70 +97,88 @@ export default function TradePage() {
                 </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1rem' }} className="stock-grid">
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.75rem' }} className="stock-grid">
                 {loading ? (
-                    <div style={{ gridColumn: 'span 2', textAlign: 'center', padding: '3rem 0', fontSize: '1.25rem', color: 'white' }}>시장 데이터를 불러오는 중...</div>
-                ) : stocks.map((stock) => (
-                    <div key={stock.id} style={{
-                        background: 'rgba(255,255,255,0.95)',
-                        borderRadius: '16px',
-                        padding: '1.5rem',
-                        border: '1px solid #e2e8f0',
-                        borderLeft: '4px solid #6366f1'
-                    }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
-                            <h3 style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#1e293b' }}>{stock.name}</h3>
-                            <div style={{ fontSize: '1.75rem', fontWeight: '800', fontFamily: 'monospace', color: '#0f172a' }}>₩{stock.currentPrice.toLocaleString()}</div>
-                        </div>
+                    <div style={{ gridColumn: 'span 3', textAlign: 'center', padding: '3rem 0', fontSize: '1.25rem', color: 'white' }}>시장 데이터를 불러오는 중...</div>
+                ) : stocks.map((stock) => {
+                    const isExpanded = expandedStockId === stock.id;
+                    return (
+                        <div
+                            key={stock.id}
+                            onClick={() => toggleExpand(stock.id)}
+                            style={{
+                                background: 'rgba(255,255,255,0.95)',
+                                borderRadius: '12px',
+                                padding: '0.875rem 1rem',
+                                border: '1px solid #e2e8f0',
+                                borderLeft: `4px solid ${isExpanded ? '#2563eb' : '#6366f1'}`,
+                                cursor: 'pointer',
+                                transition: 'box-shadow 0.15s',
+                                boxShadow: isExpanded ? '0 4px 16px rgba(37,99,235,0.15)' : 'none'
+                            }}
+                        >
+                            <div style={{ marginBottom: '0.4rem' }}>
+                                <h3 style={{ fontSize: '1rem', fontWeight: 'bold', color: '#1e293b', margin: 0 }}>{stock.name}</h3>
+                            </div>
+                            <div style={{ fontSize: '1.25rem', fontWeight: '800', fontFamily: 'monospace', color: '#0f172a', marginBottom: '0.4rem' }}>
+                                ₩{stock.currentPrice.toLocaleString()}
+                            </div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <span style={{ fontSize: '0.8rem', color: '#64748b' }}>보유</span>
+                                <span style={{ fontSize: '0.95rem', fontWeight: 'bold', fontFamily: 'monospace', color: portfolio[stock.id] ? '#2563eb' : '#94a3b8' }}>
+                                    {portfolio[stock.id] || 0}주
+                                </span>
+                            </div>
 
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', paddingTop: '0.75rem', borderTop: '1px solid #e2e8f0' }}>
-                            <span style={{ fontSize: '0.9rem', color: '#64748b' }}>보유 수량:</span>
-                            <span style={{ fontSize: '1.25rem', fontWeight: 'bold', fontFamily: 'monospace', color: '#1e293b' }}>{portfolio[stock.id] || 0} 주</span>
+                            {isExpanded && (
+                                <div
+                                    style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', marginTop: '0.75rem', paddingTop: '0.75rem', borderTop: '1px solid #e2e8f0' }}
+                                    onClick={e => e.stopPropagation()}
+                                >
+                                    <button
+                                        onClick={() => openTradeModal(stock, "BUY")}
+                                        style={{
+                                            padding: '0.5rem',
+                                            borderRadius: '8px',
+                                            background: '#2563eb',
+                                            border: 'none',
+                                            color: 'white',
+                                            fontSize: '0.9rem',
+                                            fontWeight: 'bold',
+                                            cursor: 'pointer'
+                                        }}
+                                    >
+                                        매수
+                                    </button>
+                                    <button
+                                        onClick={() => openTradeModal(stock, "SELL")}
+                                        disabled={!portfolio[stock.id]}
+                                        style={{
+                                            padding: '0.5rem',
+                                            borderRadius: '8px',
+                                            background: 'white',
+                                            border: '2px solid #64748b',
+                                            color: '#1e293b',
+                                            fontSize: '0.9rem',
+                                            fontWeight: 'bold',
+                                            cursor: portfolio[stock.id] ? 'pointer' : 'not-allowed',
+                                            opacity: portfolio[stock.id] ? 1 : 0.4
+                                        }}
+                                    >
+                                        매도
+                                    </button>
+                                </div>
+                            )}
                         </div>
-
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
-                            <button
-                                onClick={() => openTradeModal(stock, "BUY")}
-                                style={{
-                                    padding: '0.75rem',
-                                    borderRadius: '10px',
-                                    background: '#2563eb',
-                                    border: 'none',
-                                    color: 'white',
-                                    fontSize: '1rem',
-                                    fontWeight: 'bold',
-                                    cursor: 'pointer'
-                                }}
-                            >
-                                매수
-                            </button>
-                            <button
-                                onClick={() => openTradeModal(stock, "SELL")}
-                                disabled={!portfolio[stock.id]}
-                                style={{
-                                    padding: '0.75rem',
-                                    borderRadius: '10px',
-                                    background: 'white',
-                                    border: '2px solid #64748b',
-                                    color: '#1e293b',
-                                    fontSize: '1rem',
-                                    fontWeight: 'bold',
-                                    cursor: portfolio[stock.id] ? 'pointer' : 'not-allowed',
-                                    opacity: portfolio[stock.id] ? 1 : 0.4
-                                }}
-                            >
-                                매도
-                            </button>
-                        </div>
-                    </div>
-                ))}
+                    );
+                })}
             </div>
 
             {/* Mobile CSS for stock grid */}
             <style jsx>{`
-                @media (max-width: 768px) {
+                @media (max-width: 640px) {
                     .stock-grid {
-                        grid-template-columns: 1fr !important;
+                        grid-template-columns: repeat(2, 1fr) !important;
                     }
                 }
             `}</style>

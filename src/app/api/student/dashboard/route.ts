@@ -20,7 +20,7 @@ export async function GET() {
 
   // Get portfolio
   const portfolio = db.prepare(`
-    SELECT 
+    SELECT
       so.id,
       so.quantity,
       so.average_buy_price,
@@ -30,7 +30,7 @@ export async function GET() {
       s.current_price
     FROM stock_ownership so
     JOIN stocks s ON s.id = so.stock_id
-    WHERE so.student_id = ?
+    WHERE so.student_id = ? AND s.is_active = 1
   `).all(session.id as string) as any[];
 
   // Convert to camelCase
